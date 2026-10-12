@@ -1,0 +1,81 @@
+;
+; VirtualDroneController.inf
+;
+; UMDF 2 HID minidriver of a root-enumerated virtual drone controller.
+; Depends on MsHidUmdf.inf, introduced in build 22000.
+; Installed by scripts\deploy.ps1 (devcon install VirtualDroneController.inf root\VirtualDroneController).
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=HIDClass
+ClassGuid={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Provider=%ProviderString%
+DriverVer=01/01/2026,1.0.0.0
+CatalogFile=VirtualDroneController.cat
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1=%Disk_Description%,,,
+
+[SourceDisksFiles]
+VirtualDroneController.dll=1
+
+; ================= Device section =====================
+
+[Manufacturer]
+%ManufacturerString%=VirtualDroneController, NT$ARCH$.10.0...22000
+
+[VirtualDroneController.NT$ARCH$.10.0...22000]
+%DeviceDesc%=VirtualDroneController, root\VirtualDroneController
+
+[VirtualDroneController.NT]
+CopyFiles=UMDriverCopy
+Include=MsHidUmdf.inf
+Needs=MsHidUmdf.NT
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT
+
+[VirtualDroneController.NT.hw]
+Include=MsHidUmdf.inf
+Needs=MsHidUmdf.NT.hw
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT.hw
+
+[VirtualDroneController.NT.Services]
+Include=MsHidUmdf.inf
+Needs=MsHidUmdf.NT.Services
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT.Services
+
+[VirtualDroneController.NT.Filters]
+Include=WUDFRD.inf
+Needs=WUDFRD_LowerFilter.NT.Filters
+
+[VirtualDroneController.NT.Wdf]
+UmdfService="VirtualDroneController", VirtualDroneController_Install
+UmdfServiceOrder=VirtualDroneController
+UmdfKernelModeClientPolicy=AllowKernelModeClients
+UmdfFileObjectPolicy=AllowNullAndUnknownFileObjects
+UmdfMethodNeitherAction=Copy
+UmdfFsContextUsePolicy=CanUseFsContext2
+
+[VirtualDroneController_Install]
+UmdfLibraryVersion=$UMDFVERSION$
+ServiceBinary="%13%\VirtualDroneController.dll"
+
+; ================= copy files =====================
+
+[UMDriverCopy]
+VirtualDroneController.dll
+
+;---------------------------------------------------------------;
+
+[Strings]
+ProviderString     ="Nikita Biziaev"
+ManufacturerString ="Nikita Biziaev"
+Disk_Description   ="Virtual Drone Controller Installation Disk"
+DeviceDesc         ="Virtual Drone Controller"
